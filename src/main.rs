@@ -3,13 +3,14 @@ use actix_multipart::form::{MultipartForm, MultipartFormConfig, tempfile::TempFi
 use actix_web::{
     App, HttpRequest, HttpResponse, HttpServer, Responder, Result,
     dev::ServiceResponse,
+    get,
     http::header,
     middleware::{ErrorHandlerResponse, ErrorHandlers, Logger},
     post, web,
 };
 use log::{error, info};
 use ocrs::{ImageSource, OcrEngine, OcrEngineParams};
-use reqwest::get;
+use reqwest::get as fetch;
 use rten::Model;
 use serde::Serialize;
 use serde_json;
@@ -159,6 +160,11 @@ async fn recognize(
     ok_response(recognized_text)
 }
 
+#[get("/health")]
+async fn health() -> impl Responder {
+    HttpResponse::Ok().body("OK")
+}
+
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();
@@ -203,6 +209,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             )
             .app_data(app_state.clone())
             .service(recognize)
+            .service(health)
     })
     .bind("0.0.0.0:6444")?
     .run()
@@ -212,7 +219,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn download_model(url: &str) -> Result<Vec<u8>, Box<dyn Error>> {
-    let response = get(url).await?;
+    let response = fetch(url).await?;
 
     if response.status().is_success() {
         let bytes = response.bytes().await?;
