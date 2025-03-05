@@ -204,7 +204,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             .app_data(app_state.clone())
             .service(recognize)
     })
-    .bind("127.0.0.1:6444")?
+    .bind("0.0.0.0:6444")?
     .run()
     .await?;
 
