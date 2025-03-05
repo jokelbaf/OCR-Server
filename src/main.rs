@@ -53,13 +53,20 @@ fn handle_multipart_error(err: MultipartError, _req: &HttpRequest) -> actix_web:
     actix_web::error::InternalError::from_response(err, resp).into()
 }
 
+fn get_message_by_status(status: u16) -> String {
+    match status {
+        404 => "Not Found".to_string(),
+        _ => "Something went wrong".to_string(),
+    }
+}
+
 fn global_error_handler<B>(res: ServiceResponse<B>) -> Result<ErrorHandlerResponse<B>> {
     let (req, rsp) = res.into_parts();
 
     let status = rsp.status().as_u16();
     let message = match rsp.error() {
         Some(err) => format!("{}", err),
-        None => format!("Something went wrong"),
+        None => get_message_by_status(status),
     };
 
     let response = serde_json::json!({
