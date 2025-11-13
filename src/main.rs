@@ -16,7 +16,6 @@ use serde::Serialize;
 use serde_json;
 use std::error::Error;
 
-const ALPHABET: &str = " 0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~EABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåèéêëìíîïòóôõöùúûüýÿ";
 
 #[derive(Serialize)]
 struct ApiResponse<T> {
@@ -197,7 +196,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let engine = OcrEngine::new(OcrEngineParams {
         detection_model: Some(detection_model),
         recognition_model: Some(recognition_model),
-        alphabet: Some(ALPHABET.to_string()),
         ..Default::default()
     })
     .map_err(|e| {
